@@ -3,12 +3,11 @@ import schedule
 import time
 from datetime import datetime
 
-#WEBHOOK_URL = 'https://discord.com/api/webhooks/1089448366582284298/Ye1uZbFI-J6YxLSqmIHNqHbv9yadudbWHvaNfk_EEN8tpyFyrUIeRdMB7tS-3-aCaMzI'
-WEBHOOK_URL = "https://discord.com/api/webhooks/1089454889089904690/kWg_Ef03R9ddL2U9hPBbcR9U10OOy2vTxldIXe_gXqMueQbaqJQZcsrCWdNyvOHh5Za6"
+with open('webhook.txt', 'r') as f:
+    WEBHOOK_URL = f.read().strip()
 ICON = "https://cdn.discordapp.com/attachments/1089456058507989023/1089456956281982986/images.png"
 NAME = "Workout Reminder"
 COLOR = 5526612
-#BODY = 
 
 def send_message(workout, message):
     response = requests.post(WEBHOOK_URL, json={
