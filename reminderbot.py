@@ -23,7 +23,7 @@ def update_time():
     current_time = now.strftime("%H:%M:%S")
     current_hour = now.hour
 
-def send_message(workout, message):
+def send_message(time, workout, message):
     update_time()
     response = requests.post(WEBHOOK_URL, json={
     "username": "Reminder",
@@ -41,6 +41,11 @@ def send_message(workout, message):
         #"description": "Text message. You can use Markdown here. *Italic* **bold** __underline__ ~~strikeout~~ [hyperlink](https://google.com) `code`",
         "color": COLOR,
         "fields": [
+            {
+                "name": "work out",
+                "value": time,
+                "inline": True
+            },
             {
                 "name": workout,
                 "value": message,
@@ -64,16 +69,22 @@ message = "You've been a bum for an entire hour, its time to get up"
 
 def workout_reminder():
     print("reminder called")
-    if current_hour == 10:
-        send_message('Time for a workout!')
-    elif current_hour == 11:
-        send_message("push ups, sit ups", message + '\n do 30 push ups and some sit ups.')
-    elif current_hour == 12:
-        send_message("burpees", message + '\n now its time for burpees, \n do 3 sets of 10 burpees ')
-    elif current_hour == 22:
-        send_message("time", message + '\n test \n time: ' + current_time)
+    response = requests.get('https://api.quarza.online/api/workouts')
+    if response.ok:
+        workouts = response.json()
+        for workout in workouts:
+            print("workouts")
+            print(workout['time'])
+            print(workout['workout'])
+            print(workout['todo'])
+        for workout in workouts:
+            workout_time = workout['time']
+            if current_hour == workout_time:
+                workout_name = workout['workout']
+                workout_todo = workout['todo']
+                send_message(workout_time, workout_name, workout_todo)
     else:
-        send_message('test', 'Time for a workout!')
+        print(f'Error retrieving workouts: {response.text}')
 
 # Schedule tasks to run every hour after 10am GMT
 schedule.every(1).hour.do(workout_reminder)
@@ -81,6 +92,7 @@ schedule.every(1).hour.do(workout_reminder)
 def start_reminder():
     print("starting reminder")
     print("current time: " + current_time)
+    workout_reminder()
     while True:
         update_time()
         schedule.run_pending()
