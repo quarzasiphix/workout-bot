@@ -28,17 +28,12 @@ def send_message(time, workout, message):
     response = requests.post(WEBHOOK_URL, json={
     "username": "Reminder",
     "avatar_url": ICON,
-    #"content": "Text message. Up to 2000 characters.",
+    "content": "@everyone get off your ass, bum",
     "embeds": [
         {
         "author": {
             "name": NAME,
-            #"url": ICON,
-            #"icon_url": ICON
         },
-        #"title": "REMINDER",
-        #"url": "https://google.com/",
-        #"description": "Text message. You can use Markdown here. *Italic* **bold** __underline__ ~~strikeout~~ [hyperlink](https://google.com) `code`",
         "color": COLOR,
         "fields": [
             {
@@ -72,17 +67,21 @@ def workout_reminder():
     response = requests.get('https://api.quarza.online/api/workouts')
     if response.ok:
         workouts = response.json()
+        print("workouts")
         for workout in workouts:
-            print("workouts")
-            print(workout['time'])
-            print(workout['workout'])
-            print(workout['todo'])
+            print("workout: ", workout['id'])
+            print("hour: ", workout['time'])
+            print("workout: ", workout['workout'])
+            print("todo: ", workout['todo'])
         for workout in workouts:
             workout_time = workout['time']
             if current_hour == workout_time:
                 workout_name = workout['workout']
                 workout_todo = workout['todo']
                 send_message(workout_time, workout_name, workout_todo)
+            else:
+                if 10 <= current_hour < 20:
+                    send_message("time to get up", "stop being a bum", "do something")
     else:
         print(f'Error retrieving workouts: {response.text}')
 
@@ -97,11 +96,5 @@ def start_reminder():
         update_time()
         schedule.run_pending()
         time.sleep(1)
-
-def main():
-    print("calling send message")
-    send_message("PUSH UPS", '\n do 30 push ups and some sit ups.')
-    
-    #send_message(message + '\n now its time for burpees, \n do 3 sets of 10 burpees ')
 
 start_reminder()
