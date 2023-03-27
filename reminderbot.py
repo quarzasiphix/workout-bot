@@ -4,7 +4,6 @@ import time
 from datetime import datetime
 import pytz
 
-
 with open('webhook.txt', 'r') as f:
     WEBHOOK_URL = f.read().strip()
 ICON = "https://cdn.discordapp.com/attachments/1089456058507989023/1089456956281982986/images.png"
@@ -69,7 +68,7 @@ def send_message(time, workout, message):
 message = "You've been a bum for an entire hour, its time to get up"
 workouts = []
 res = []
-minute = "00"
+minute = "07"
 
 def get_workouts():
     global workouts, res
@@ -104,7 +103,7 @@ def workout_reminder():
                 send_message(workout_time, workout_name, workout_todo)
                 already_called = True
             
-        if 10 <= current_hour < 20 and not already_called:
+        if 8 <= current_hour < 20 and not already_called:
                 send_message(current_time, "stop being a bum", "do something")
                 already_called = True
     else:
@@ -125,5 +124,5 @@ def start_reminder():
             # Clear any pending tasks that may have been scheduled earlier
             schedule.clear('workout_reminder')
         schedule.run_pending()
-        time.sleep(30)
+        time.sleep(10)
 start_reminder()
