@@ -34,7 +34,7 @@ def send_message(time, workout, message):
         response = requests.post(WEBHOOK_URL, json={
         "username": "Reminder",
         "avatar_url": ICON,
-        "content": "everyone get off your ass, bum",
+        "content": "@everyone get off your ass, bum",
         "embeds": [
             {
             "author": {
