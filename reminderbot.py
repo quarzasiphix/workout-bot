@@ -33,7 +33,7 @@ def send_message(time, workout, message):
         response = requests.post(WEBHOOK_URL, json={
         "username": "Reminder",
         "avatar_url": ICON,
-        "content": " get off your ass, bum",
+        "content": "everyone get off your ass, bum",
         "embeds": [
             {
             "author": {
@@ -57,8 +57,7 @@ def send_message(time, workout, message):
                 "icon_url": ICON
             }
             }
-        ]
-        })
+        ]})
 
         if response.ok:
             print(f'Message sent: {message}')
@@ -67,20 +66,33 @@ def send_message(time, workout, message):
         already_called = True
 
 message = "You've been a bum for an entire hour, its time to get up"
+workouts = []
+res = []
 
-def workout_reminder():
-    print("reminder called")
-    global already_called
-    already_called = False
+def get_workouts():
+    global workouts, res
     response = requests.get('https://api.quarza.online/api/workouts')
     if response.ok:
         workouts = response.json()
+        res = response.json
         print("workouts")
         for workout in workouts:
             print("workout: ", workout['id'])
             print("hour: ", workout['time'])
             print("workout: ", workout['workout'])
             print("todo: ", workout['todo'])
+        print("current time: " + current_time)
+        return True
+    else:
+        return False
+
+def workout_reminder():
+    print("reminder called")
+    global already_called, workouts, res
+    already_called = False
+    print("updating workouts..")
+    update = get_workouts()
+    if update == True: 
         for workout in workouts:
             workout_time = workout['time']
             if current_hour == workout_time and not already_called:
@@ -93,19 +105,22 @@ def workout_reminder():
                     send_message(current_time, "stop being a bum", "do something")
                     already_called = True
     else:
-        print(f'Error retrieving workouts: {response.text}')
+        print(f'Error retrieving workouts: {res.text}')
 
-# Schedule tasks to run every hour after 10am GMT
-schedule.every().hour.at(":00").do(workout_reminder).tag('workout_reminder')
-#schedule.every().minute.do(workout_reminder)
 
 def start_reminder():
     print("starting reminder")
     print("current time: " + current_time)
-    workout_reminder()
+    get_workouts()
     while True:
-        update_time()
+        if now.hour >= 6 and now.hour < 20:
+            # Schedule tasks to run every hour after 10am GMT till 8pm
+            #schedule.every().hour.at(":00").do(workout_reminder).tag('workout_reminder')
+            schedule.every().minute.do(workout_reminder)
+        else:
+            # Clear any pending tasks that may have been scheduled earlier
+            schedule.clear('workout_reminder')
         schedule.run_pending()
-        time.sleep(1)
+        time.sleep(60)
 
 start_reminder()
