@@ -33,7 +33,7 @@ def send_message(time, workout, message):
         response = requests.post(WEBHOOK_URL, json={
         "username": "Reminder",
         "avatar_url": ICON,
-        "content": "@everyone get off your ass, bum",
+        "content": "@ everyone get off your ass, bum",
         "embeds": [
             {
             "author": {
@@ -68,10 +68,12 @@ def send_message(time, workout, message):
 message = "You've been a bum for an entire hour, its time to get up"
 workouts = []
 res = []
-minute = "07"
+minute = "51"
+wait = 20
+till = current_hour
 
 def get_workouts():
-    global workouts, res
+    global workouts, res, till
     response = requests.get('https://api.quarza.online/api/workouts')
     if response.ok:
         workouts = response.json()
@@ -83,35 +85,40 @@ def get_workouts():
             print("workout: ", workout['workout'])
             print("todo: ", workout['todo'])
         print("current time: " + current_time)
+        print("waiting till: ", till, ":", minute)
+        till = current_hour + 1
         return True
     else:
         return False
 
 def workout_reminder():
-    print("reminder called")
-    global already_called, workouts, res
-    already_called = False
-    print("updating workouts..")
-    update_time()
-    update = get_workouts()
-    if update == True: 
-        for workout in workouts:
-            workout_time = workout['time']
-            if current_hour == workout_time and not already_called:
-                workout_name = workout['workout']
-                workout_todo = workout['todo']
-                send_message(workout_time, workout_name, workout_todo)
-                already_called = True
-            
-        if 8 <= current_hour < 20 and not already_called:
-                send_message(current_time, "stop being a bum", "do something")
-                already_called = True
-    else:
-        print(f'Error retrieving workouts: {res.text}')
-    time.sleep(60)
+    while True:
+        global already_called, workouts, res
+        print("updating workouts..")
+        update_time()
+        update = get_workouts()
+        already_called = False  # Reset the flag at the beginning of the function
+        if update == True: 
+            for workout in workouts:
+                workout_time = workout['time']
+                if current_hour == workout_time and already_called :
+                    workout_name = workout['workout']
+                    workout_todo = workout['todo']
+                    send_message(workout_time, workout_name, workout_todo)
+                    already_called = True
+                
+            if 8 <= current_hour < 20 and not already_called:
+                    send_message(current_time, "stop being a bum", "do something")
+                    already_called = True
+            print("waiting for: ", wait, "s till next message")
+            time.sleep(wait) # sleep for hour and loop
+        else:
+            print(f'Error retrieving workouts: {res.text}')
+            quit()
 
 
 def start_reminder():
+    global already_called
     print("starting reminder")
     print("current time: " + current_time)
     get_workouts()
