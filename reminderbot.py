@@ -16,14 +16,15 @@ tz = pytz.timezone('Europe/Warsaw')
 now = datetime.now(tz)
 # format the current time as a string
 current_time = now.strftime("%H:%M:%S")
+current_min = now.strftime("%M")
 current_hour = now.hour
-
 already_called = False
 
 def update_time():  
-    global now, current_time, current_hour
+    global now, current_time, current_hour, current_min
     now = datetime.now(tz)
     current_time = now.strftime("%H:%M:%S")
+    current_min = now.strftime("%M")
     current_hour = now.hour
 
 def send_message(time, workout, message):
@@ -68,6 +69,7 @@ def send_message(time, workout, message):
 message = "You've been a bum for an entire hour, its time to get up"
 workouts = []
 res = []
+minute = "00"
 
 def get_workouts():
     global workouts, res
@@ -91,6 +93,7 @@ def workout_reminder():
     global already_called, workouts, res
     already_called = False
     print("updating workouts..")
+    update_time()
     update = get_workouts()
     if update == True: 
         for workout in workouts:
@@ -102,10 +105,11 @@ def workout_reminder():
                 already_called = True
             else:
                 if 10 <= current_hour < 20:
-                    send_message(current_time, "stop being a bum", "do something")
-                    already_called = True
+                        send_message(current_time, "stop being a bum", "do something")
+                        already_called = True
     else:
         print(f'Error retrieving workouts: {res.text}')
+    time.sleep(60)
 
 
 def start_reminder():
@@ -115,12 +119,11 @@ def start_reminder():
     while True:
         if now.hour >= 6 and now.hour < 20:
             # Schedule tasks to run every hour after 10am GMT till 8pm
-            schedule.every().hour.at(":00").do(workout_reminder).tag('workout_reminder')
+            schedule.every().hour.at(":" + minute).do(workout_reminder).tag('workout_reminder')
             #schedule.every().minute.do(workout_reminder)
         else:
             # Clear any pending tasks that may have been scheduled earlier
             schedule.clear('workout_reminder')
         schedule.run_pending()
-        time.sleep(60)
-
+        time.sleep(30)
 start_reminder()
