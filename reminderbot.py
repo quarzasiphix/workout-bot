@@ -103,10 +103,10 @@ def workout_reminder():
                 workout_todo = workout['todo']
                 send_message(workout_time, workout_name, workout_todo)
                 already_called = True
-            else:
-                if 10 <= current_hour < 20:
-                        send_message(current_time, "stop being a bum", "do something")
-                        already_called = True
+            
+        if 10 <= current_hour < 20 and not already_called:
+                send_message(current_time, "stop being a bum", "do something")
+                already_called = True
     else:
         print(f'Error retrieving workouts: {res.text}')
     time.sleep(60)
