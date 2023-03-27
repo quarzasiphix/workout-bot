@@ -115,8 +115,8 @@ def start_reminder():
     while True:
         if now.hour >= 6 and now.hour < 20:
             # Schedule tasks to run every hour after 10am GMT till 8pm
-            #schedule.every().hour.at(":00").do(workout_reminder).tag('workout_reminder')
-            schedule.every().minute.do(workout_reminder)
+            schedule.every().hour.at(":00").do(workout_reminder).tag('workout_reminder')
+            #schedule.every().minute.do(workout_reminder)
         else:
             # Clear any pending tasks that may have been scheduled earlier
             schedule.clear('workout_reminder')
