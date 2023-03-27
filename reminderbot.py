@@ -96,8 +96,8 @@ def workout_reminder():
         print(f'Error retrieving workouts: {response.text}')
 
 # Schedule tasks to run every hour after 10am GMT
-#schedule.every().hour.at(":00").do(workout_reminder).tag('workout_reminder')
-schedule.every().minute.do(workout_reminder)
+schedule.every().hour.at(":00").do(workout_reminder).tag('workout_reminder')
+#schedule.every().minute.do(workout_reminder)
 
 def start_reminder():
     print("starting reminder")
