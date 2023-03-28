@@ -68,7 +68,7 @@ def send_message(time, workout, message):
 message = "You've been a bum for an entire hour, its time to get up"
 workouts = []
 res = []
-minute = "07"
+minute = "00"
 wait = 3600
 till = current_hour
 start = 6
