@@ -3,9 +3,17 @@ import schedule
 import time
 from datetime import datetime
 import pytz
+import json
 
 with open('webhook.txt', 'r') as f:
     WEBHOOK_URL = f.read().strip()
+
+with open('api.link', 'r') as f:
+    API_URL = f.read().strip()
+
+data = []
+
+
 ICON = "https://cdn.discordapp.com/attachments/1089456058507989023/1089456956281982986/images.png"
 NAME = "Workout Reminder"
 COLOR = 5526612
@@ -19,6 +27,25 @@ current_min = now.strftime("%M")
 current_hour = now.hour
 already_called = False
 
+# Load JSON data from file
+with open('post.json', 'r') as f:
+    data = json.load(f)
+#modify the json
+data['embeds'][0]['color'] = COLOR
+data['embeds'][0]['author']['name'] = NAME
+data['content'] = "@everyone time to work out!"
+data['avatar_url'] = ICON
+data['embeds'][0]['footer']['icon_url'] = ICON
+
+message = "You've been a bum for an entire hour, its time to get up"
+workouts = []
+#res = []
+minute = "00"
+wait = 3600
+till = current_hour
+start = 6
+stop = 21
+        
 def update_time():  
     global now, current_time, current_hour, current_min
     now = datetime.now(tz)
@@ -27,59 +54,31 @@ def update_time():
     current_hour = now.hour
 
 def send_message(time, workout, message):
-    global already_called
+    global already_called, data
     if already_called == False:
         update_time()
-        response = requests.post(WEBHOOK_URL, json={
-        "username": "Reminder",
-        "avatar_url": ICON,
-        "content": "@everyone get off your ass, bum",
-        "embeds": [
-            {
-            "author": {
-                "name": NAME,
-            },
-            "color": COLOR,
-            "fields": [
-                {
-                    "name": "work out",
-                    "value": time,
-                    "inline": True
-                },
-                {
-                    "name": workout,
-                    "value": message,
-                    "inline": True
-                }
-            ],
-            "footer": {
-                "text": "You've been a bum for an entire hour, its time to get up",
-                "icon_url": ICON
-            }
-            }
-        ]})
-
+        # add the workout to the json
+        #data['embeds'][0][0]['fields'][0]['name'] = "new workout name"
+        data['embeds'][0]['fields'][0]['value'] = str(time)
+        data['embeds'][0]['fields'][1]['name'] = workout
+        data['embeds'][0]['fields'][1]['value'] = message
+        # print json
+        #print(data)
+        headers = {'Content-Type': 'application/json'}
+        data_str = json.dumps(data)
+        response = requests.post(WEBHOOK_URL, data_str, headers=headers)
         if response.ok:
             print(f'Message sent: {message}')
         else:
             print(f'Error sending message: {response.text}')
         already_called = True
 
-message = "You've been a bum for an entire hour, its time to get up"
-workouts = []
-res = []
-minute = "00"
-wait = 3600
-till = current_hour
-start = 6
-stop = 20
-
 def get_workouts():
-    global workouts, res, till
-    response = requests.get('https://api.quarza.online/api/workouts')
+    global workouts, till
+    response = requests.get(API_URL)
     if response.ok:
         workouts = response.json()
-        res = response.json
+        #res = response.json
         print("workouts")
         for workout in workouts:
             print("workout: ", workout['id'])
@@ -93,7 +92,7 @@ def get_workouts():
     else:
         return False
     
-def workout_time():
+def get_workout_time():
     update_time()
     if now.hour >= start and now.hour < stop:
         print("init workout")
@@ -104,7 +103,7 @@ def workout_time():
 
 
 def workout_reminder():
-    while True:
+    while get_workout_time() == True:
         global already_called, workouts, res
         print("updating workouts..")
         update_time()
@@ -117,19 +116,14 @@ def workout_reminder():
                     workout_name = workout['workout']
                     workout_todo = workout['todo']
                     send_message(workout_time, workout_name, workout_todo)
-                    already_called = True
-                
-            if workout_time() == True and already_called == False:
+            if get_workout_time() == True and already_called == False:
                     send_message(current_time, "stop being a bum", "do something")
-                    already_called = True
-            if workout_time() == True:
-                print("waiting for: ", wait, "s till next message")
-                time.sleep(wait) # sleep for hour and loop
-            else:
-                print("going back to scheduler to reset loop")
+            print("waiting for: ", wait, "s till next message")
+            time.sleep(wait) # sleep for hour and loop
         else:
             print(f'Error retrieving workouts: {res.text}')
             quit()
+    print("going back to scheduler to reset loop")
 
 
 def start_reminder():

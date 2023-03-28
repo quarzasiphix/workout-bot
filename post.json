@@ -1,0 +1,27 @@
+{
+    "username": "Reminder",
+    "avatar_url": "ICON",
+    "content": "@everyone get off your ass, bum",
+    "embeds": [{
+        "author": {
+            "name": "NAME"
+        },
+        "color": 123,
+        "fields": [
+            {
+                "name": "work out",
+                "value": "time",
+                "inline": true
+            },
+            {
+                "name": "workout",
+                "value": "message",
+                "inline": true
+            }
+        ],
+        "footer": {
+            "text": "You've been a bum for an entire hour, its time to get up",
+            "icon_url": "ICON"
+        }
+    }]
+}
