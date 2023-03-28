@@ -33,7 +33,7 @@ def send_message(time, workout, message):
         response = requests.post(WEBHOOK_URL, json={
         "username": "Reminder",
         "avatar_url": ICON,
-        "content": "@ everyone get off your ass, bum",
+        "content": "@everyone get off your ass, bum",
         "embeds": [
             {
             "author": {
@@ -68,9 +68,11 @@ def send_message(time, workout, message):
 message = "You've been a bum for an entire hour, its time to get up"
 workouts = []
 res = []
-minute = "51"
-wait = 20
+minute = "07"
+wait = 3600
 till = current_hour
+start = 6
+stop = 20
 
 def get_workouts():
     global workouts, res, till
@@ -85,11 +87,21 @@ def get_workouts():
             print("workout: ", workout['workout'])
             print("todo: ", workout['todo'])
         print("current time: " + current_time)
-        print("waiting till: ", till, ":", minute)
         till = current_hour + 1
+        print("waiting till: ", till, ":", minute)
         return True
     else:
         return False
+    
+def workout_time():
+    update_time()
+    if now.hour >= start and now.hour < stop:
+        print("init workout")
+        return True
+    else:
+        print("not workout out time")
+        return False
+
 
 def workout_reminder():
     while True:
@@ -101,17 +113,20 @@ def workout_reminder():
         if update == True: 
             for workout in workouts:
                 workout_time = workout['time']
-                if current_hour == workout_time and already_called :
+                if current_hour == workout_time and already_called == False:
                     workout_name = workout['workout']
                     workout_todo = workout['todo']
                     send_message(workout_time, workout_name, workout_todo)
                     already_called = True
                 
-            if 8 <= current_hour < 20 and not already_called:
+            if workout_time() == True and already_called == False:
                     send_message(current_time, "stop being a bum", "do something")
                     already_called = True
-            print("waiting for: ", wait, "s till next message")
-            time.sleep(wait) # sleep for hour and loop
+            if workout_time() == True:
+                print("waiting for: ", wait, "s till next message")
+                time.sleep(wait) # sleep for hour and loop
+            else:
+                print("going back to scheduler to reset loop")
         else:
             print(f'Error retrieving workouts: {res.text}')
             quit()
@@ -123,7 +138,7 @@ def start_reminder():
     print("current time: " + current_time)
     get_workouts()
     while True:
-        if now.hour >= 6 and now.hour < 20:
+        if now.hour >= start and now.hour < stop:
             # Schedule tasks to run every hour after 10am GMT till 8pm
             schedule.every().hour.at(":" + minute).do(workout_reminder).tag('workout_reminder')
             #schedule.every().minute.do(workout_reminder)
