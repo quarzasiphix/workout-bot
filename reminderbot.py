@@ -132,17 +132,20 @@ def start_reminder():
     print("current time: " + current_time)
     get_workouts()
     while True:
-        if now.hour >= start and now.hour < stop:
+        if get_workout_time() == True:
             # Schedule tasks to run every hour after 10am GMT till 8pm
             if already_called == False:
-                schedule.every().hour.at(":" + minute).do(workout_reminder).tag('workout_reminder')
+                schedule.every().minute.do(workout_reminder)
+                #schedule.every().hour.at(":" + minute).do(workout_reminder).tag('workout_reminder')
             elif already_called == True:
                 time.sleep(60)
                 already_called = False
-            #schedule.every().minute.do(workout_reminder)
+            schedule.run_pending()
         else:
             # Clear any pending tasks that may have been scheduled earlier
             schedule.clear('workout_reminder')
-        schedule.run_pending()
+            print("not workout time yet, waiting till its time to workout")
+            while get_workout_time() == False:
+                time.sleep(60)
         time.sleep(10)
 start_reminder()
