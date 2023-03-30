@@ -101,10 +101,9 @@ def get_workout_time():
         print("not workout out time")
         return False
 
-
 def workout_reminder():
-    while get_workout_time() == True:
-        global already_called, workouts, res
+    if get_workout_time() == True:
+        global already_called, workouts
         print("updating workouts..")
         update_time()
         update = get_workouts()
@@ -119,10 +118,11 @@ def workout_reminder():
             if get_workout_time() == True and already_called == False:
                     send_message(current_time, "stop being a bum", "do something")
             print("waiting for: ", wait, "s till next message")
-            time.sleep(wait) # sleep for hour and loop
+            #time.sleep(wait) # sleep for hour and loop
         else:
-            print(f'Error retrieving workouts: {res.text}')
+            print(f'Error retrieving workouts')
             quit()
+    print(current_time)
     print("going back to scheduler to reset loop")
 
 
@@ -134,7 +134,11 @@ def start_reminder():
     while True:
         if now.hour >= start and now.hour < stop:
             # Schedule tasks to run every hour after 10am GMT till 8pm
-            schedule.every().hour.at(":" + minute).do(workout_reminder).tag('workout_reminder')
+            if already_called == False:
+                schedule.every().hour.at(":" + minute).do(workout_reminder).tag('workout_reminder')
+            elif already_called == True:
+                time.sleep(60)
+                already_called = False
             #schedule.every().minute.do(workout_reminder)
         else:
             # Clear any pending tasks that may have been scheduled earlier
