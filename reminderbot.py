@@ -33,18 +33,18 @@ with open('post.json', 'r') as f:
 #modify the json
 data['embeds'][0]['color'] = COLOR
 data['embeds'][0]['author']['name'] = NAME
-data['content'] = "@everyone time to work out!"
+data['content'] = "@ everyone time to work out!"
 data['avatar_url'] = ICON
 data['embeds'][0]['footer']['icon_url'] = ICON
 
 message = "You've been a bum for an entire hour, its time to get up"
 workouts = []
 #res = []
-minute = "00"
-wait = 3600
+minute = "21"
+#wait = 3600
 till = current_hour
 start = 6
-stop = 21
+stop = 23
         
 def update_time():  
     global now, current_time, current_hour, current_min
@@ -95,10 +95,9 @@ def get_workouts():
 def get_workout_time():
     update_time()
     if now.hour >= start and now.hour < stop:
-        print("init workout")
         return True
     else:
-        print("not workout out time")
+        print("not workout time")
         return False
 
 def workout_reminder():
@@ -117,14 +116,20 @@ def workout_reminder():
                     send_message(workout_time, workout_name, workout_todo)
             if get_workout_time() == True and already_called == False:
                     send_message(current_time, "stop being a bum", "do something")
-            print("waiting for: ", wait, "s till next message")
+                    till = current_hour + 1
+                    print("waiting till: ", till, ":", minute)
             #time.sleep(wait) # sleep for hour and loop
         else:
             print(f'Error retrieving workouts')
             quit()
     print(current_time)
     print("going back to scheduler to reset loop")
+    print("starting reminder")
+    print("current time: " + current_time)
 
+#schedule.every().minute.do(workout_reminder).tag('workout_reminder')
+schedule.every().hour.at(":" + minute).do(workout_reminder).tag('workout_reminder')
+                
 
 def start_reminder():
     global already_called
@@ -134,12 +139,8 @@ def start_reminder():
     while True:
         if get_workout_time() == True:
             # Schedule tasks to run every hour after 10am GMT till 8pm
-            if already_called == False:
-                schedule.every().minute.do(workout_reminder)
-                #schedule.every().hour.at(":" + minute).do(workout_reminder).tag('workout_reminder')
-            elif already_called == True:
+            if already_called == True:
                 time.sleep(60)
-                already_called = False
             schedule.run_pending()
         else:
             # Clear any pending tasks that may have been scheduled earlier
