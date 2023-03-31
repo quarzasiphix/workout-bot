@@ -44,7 +44,7 @@ minute = "00"
 #wait = 3600
 till = current_hour
 start = 6
-stop = 23
+stop = 22
         
 def update_time():  
     global now, current_time, current_hour, current_min
