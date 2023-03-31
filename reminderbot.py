@@ -33,14 +33,14 @@ with open('post.json', 'r') as f:
 #modify the json
 data['embeds'][0]['color'] = COLOR
 data['embeds'][0]['author']['name'] = NAME
-data['content'] = "@ everyone time to work out!"
+data['content'] = "@everyone time to work out!"
 data['avatar_url'] = ICON
 data['embeds'][0]['footer']['icon_url'] = ICON
 
 message = "You've been a bum for an entire hour, its time to get up"
 workouts = []
 #res = []
-minute = "21"
+minute = "23"
 #wait = 3600
 till = current_hour
 start = 6
