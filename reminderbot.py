@@ -58,12 +58,10 @@ def send_message(time, workout, message):
     if already_called == False:
         update_time()
         # add the workout to the json
-        #data['embeds'][0][0]['fields'][0]['name'] = "new workout name"
         data['embeds'][0]['fields'][0]['value'] = str(time)
         data['embeds'][0]['fields'][1]['name'] = workout
         data['embeds'][0]['fields'][1]['value'] = message
         # print json
-        #print(data)
         headers = {'Content-Type': 'application/json'}
         data_str = json.dumps(data)
         response = requests.post(WEBHOOK_URL, data_str, headers=headers)
@@ -78,7 +76,6 @@ def get_workouts():
     response = requests.get(API_URL)
     if response.ok:
         workouts = response.json()
-        #res = response.json
         print("workouts")
         for workout in workouts:
             print("workout: ", workout['id'])
@@ -97,7 +94,6 @@ def get_workout_time():
     if now.hour >= start and now.hour < stop:
         return True
     else:
-        print("not workout time")
         return False
 
 def workout_reminder():
@@ -118,7 +114,6 @@ def workout_reminder():
                     send_message(current_time, "stop being a bum", "do something")
                     till = current_hour + 1
                     print("waiting till: ", till, ":", minute)
-            #time.sleep(wait) # sleep for hour and loop
         else:
             print(f'Error retrieving workouts')
             quit()
