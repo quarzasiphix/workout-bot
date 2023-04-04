@@ -46,6 +46,7 @@ till = current_hour
 start = 6
 stop = 22
         
+
 def update_time():  
     global now, current_time, current_hour, current_min
     now = datetime.now(tz)
@@ -140,6 +141,7 @@ def start_reminder():
         else:
             # Clear any pending tasks that may have been scheduled earlier
             schedule.clear('workout_reminder')
+            #gets stuck here
             print("not workout time yet, waiting till its time to workout")
             while get_workout_time() == False:
                 time.sleep(60)
