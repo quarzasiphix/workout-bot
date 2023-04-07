@@ -3,4 +3,4 @@
 <p> sends a message to a webhook reminding you to work out </p>
 
 
-![example](https://github.com/quarzasiphix/workout-bot/blob/master/example.png)
+![example](https://github.com/quarzasiphix/screenshots/blob/main/workout-reminder-embed.png)
