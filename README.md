@@ -1,5 +1,5 @@
 # workout-bot
-<h3> exercise bot </h3>
+<h3> Exercise bot </h3>
 <p> sends a message to a webhook reminding you to work out </p>
 
 
